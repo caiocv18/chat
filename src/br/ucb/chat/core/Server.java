@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import br.ucb.chat.jobs.ConversationHandlerJob;
+import br.ucb.chat.jobs.ExitJob;
 
 public class Server {
     /**Atributos do servidor */
@@ -20,6 +21,10 @@ public class Server {
         // Método accept do serversocket para retornar os sockets conectados
         ServerSocket ss = new ServerSocket(9806);
 
+        // Iniciando nossa thread
+        ExitJob exitJob = new ExitJob(ss);
+        exitJob.start();
+
         while (true) {
             // Após estabelecer contato com o ServerSocket, um socket de comunicação
             // (cliente - server) eh criado
@@ -31,6 +36,9 @@ public class Server {
 
             // Dados início a thread que vai coordenar a conversa
             handler.start();
+
+            // Adiciona o socket na seleção do job
+            exitJob.sockets.add(soc);
         }
 
     }

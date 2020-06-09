@@ -1,6 +1,8 @@
 package br.ucb.chat.jobs;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,6 +17,14 @@ public class ConversationHandlerJob extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private String userName;
+
+    /**Log */
+
+    static FileWriter fileWriter;
+    static BufferedWriter bufferedWriter;
+    static PrintWriter logPrintWriter;
+
+    /**Fim Log */
 
     /** Getters e Setters */
     public Socket getSocket() {
@@ -49,10 +59,19 @@ public class ConversationHandlerJob extends Thread {
 		this.userName = userName;
 	}
 
-    /** Construtor ConversationHandlerJob */
-    public ConversationHandlerJob(Socket socket) {
+    /**
+     * Construtor ConversationHandlerJob
+     * 
+     * @throws IOException
+     */
+    public ConversationHandlerJob(Socket socket) throws IOException {
         // Set no Socket enviado por parâmetro
         setSocket(socket);
+
+        // Configurar o FileWriter
+        fileWriter = new FileWriter("C:\\Users\\caiov\\Google Drive\\5-Semestre\\05-Programacao-Concorrente-e-Distribuida\\exercicios\\Chat\\Logs.txt",true);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        logPrintWriter = new PrintWriter(bufferedWriter,true);
     }
 
     /** Métodos core da Thread */
@@ -101,6 +120,11 @@ public class ConversationHandlerJob extends Thread {
                 if(clientMessage == null){
                     return;
                 }
+
+                // Fazendo o log
+                logPrintWriter.println(getUserName() + ": " + clientMessage);
+                // Fim do log
+
                 // Se não for nula, vamos enviar para todos os clientes
                 for (PrintWriter writer : Server.printWriters) {
                     writer.println(getUserName() + ": " + clientMessage); // Formatamos a mensagem a ser enviada para os clientes
